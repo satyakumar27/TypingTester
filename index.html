@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Typing Speed Tester</title>
+</head>
+<body>
+    <h1>Typing Speed Tester</h1>
+    <p id="sentence"></p>
+    <textarea id="input" placeholder="Start typing here..." rows="5" cols="50"></textarea>
+    
+    <p>Time: <span id="time">0</span> sec</p>
+    <p>WPM <span id="wpm">0</span></p>
+    <p>Accuracy: <span id="accuracy">0</span> %</p>
+
+    <button onclick="restartTest()">Restart</button>
+
+    <script>
+        const sentences=[
+            "Typing fast requires practice and consistency that you must have in order to improve now random words but yeah you need that.",
+            "Javascript is what I am using to build this in order to make it work blah haha lol okay done this one",
+            "Focus on accuracy before speed when typing."
+        ];
+        let startTime = null;
+        let timer = null;
+        let time = 0;
+        
+        const sentenceEl = document.getElementById("sentence");
+        const inputEl = document.getElementById("input");
+
+        function loadSentence() {
+            const random = Math.floor(Math.random() * sentences.length);
+            sentenceEl.textContent = sentences[random];
+        }
+
+        function startTimer() {
+            startTime = new Date();
+            timer = setInterval(() => {
+                const currentTime = Math.floor((new Date() - startTime) / 1000);
+                document.getElementById("time").textContent = currentTime;
+            }, 1000);
+        }
+
+        inputEl.addEventListener("input", () => {
+            if (timer === null) {
+                startTimer();
+            }
+
+            const inputText = inputEl.value;
+            const originalText = sentenceEl.textContent;
+            const currentTime = Math.floor((new Date() - startTime) / 1000);
+            time = currentTime > 0 ? currentTime : 1;
+            document.getElementById("time").textContent = currentTime;
+            const words = inputText.trim() === "" ? 0 : inputText.trim().split(/\s+/).length;
+            const wpm = Math.round((words / time) * 60);
+            document.getElementById("wpm").textContent = wpm;
+
+            let correct = 0;
+            for (let i = 0; i < inputText.length; i++) {
+                if (inputText[i] === originalText[i]) {
+                    correct++;
+                }
+            }
+            const accuracy = inputText.length > 0
+                ? Math.round((correct / inputText.length) * 100)
+                : 0;
+            document.getElementById("accuracy").textContent = accuracy;
+
+            if (inputText.trim() === originalText.trim()) {
+                clearInterval(timer);
+                timer = null;
+                alert("Test Completed!");
+            }
+        });
+
+        function restartTest() {
+            clearInterval(timer);
+            timer = null;
+            startTime = null;
+            time = 0;
+
+            inputEl.value = "";
+            document.getElementById("time").textContent = 0;
+            document.getElementById("wpm").textContent = 0;
+            document.getElementById("accuracy").textContent = 0;
+
+            loadSentence();
+        }
+
+        loadSentence();
+    </script>
+</body>
+</html>
